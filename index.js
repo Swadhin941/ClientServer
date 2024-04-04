@@ -44,7 +44,7 @@ const verifyJWT = (req, res, next) => {
 }
 
 const forbiddenAccess = (req, res, next) => {
-    console.log(req.query.user, req.query.user === req.decoded.email);
+    // console.log(req.query.user, req.query.user === req.decoded.email);
     if (req.decoded.email === req.query.user) {
         next();
     }
@@ -135,7 +135,7 @@ const run = async () => {
 
 
         app.post("/addDesign", verifyJWT, verifyDesigner, async (req, res) => {
-            console.log(req.body);
+            // console.log(req.body);
             const result = await AllDesigns.insertOne({ ...req.body });
             res.send(result);
         })
@@ -147,6 +147,9 @@ const run = async () => {
                     let currentDate = new Date().toLocaleDateString("en-US", {
                         timeZone: result?.region
                     }).split('/');
+                    const subscriptionDate = parseInt(result.subscriptionOut.split('/')[1])
+                    const subscriptionMonth = parseInt(result.subscriptionOut.split('/')[0])
+                    const subscriptionYear = parseInt(result.subscriptionOut.split('/')[2])
                     let tempDate = parseInt(currentDate[1]);
                     let tempMonth = parseInt(currentDate[0]);
                     let tempYear = parseInt(currentDate[2]);
@@ -455,6 +458,12 @@ const run = async () => {
         app.post('/postPackage', verifyJWT, verifyAdmin, async (req, res) => {
             // console.log(req.body);
             const result = await Packages.insertOne({ ...req.body })
+            res.send(result);
+        })
+
+        app.delete("/deletePackage",verifyJWT, verifyAdmin, async(req, res)=>{
+            const deleteId = req.query.deleteId;
+            const result = await Packages.deleteOne({_id: new ObjectId(deleteId)});
             res.send(result);
         })
 
